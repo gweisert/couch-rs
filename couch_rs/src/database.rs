@@ -719,6 +719,20 @@ impl Database {
         }
     }
 
+    pub async fn save_raw<T: Serialize>(&self, id: String, doc: &T) -> DocumentCreatedResult {
+        let body = to_string(&doc)?;
+        let response = self._client.put(&self.create_document_path(&id), body).send().await?;
+        let status = response.status();
+        let data: DocumentCreatedResponse = response.json().await?;
+
+        if let (Some(true), Some(id), Some(rev)) = (data.ok, data.id, data.rev) {
+            Ok(DocumentCreatedDetails { id, rev })
+        } else {
+            let err = data.error.unwrap_or_else(|| s!("unspecified error"));
+            Err(CouchError::new(err, status))
+        }
+    }
+
     /// Creates a document from a raw JSON document Value.
     /// Usage:
     ///
