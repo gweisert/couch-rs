@@ -720,8 +720,20 @@ impl Database {
     }
 
     pub async fn save_raw<T: Serialize>(&self, id: String, doc: &T) -> DocumentCreatedResult {
-        let body = to_string(&doc)?;
-        let response = self._client.put(&self.create_document_path(&id), body).send().await?;
+        let doc_path = self.create_document_path(&id);
+        let mut value = serde_json::to_value(doc)?;
+        {
+            let obj = value.as_object_mut().expect("we just built this object");
+            if let Ok(mut old) = self.get_raw(&id).await {
+                if let Some(rev) = old.as_object_mut().expect("invariant").remove("_rev") {
+                    obj.insert("_rev".to_string(), rev);
+                }
+            }
+            obj.insert("id".to_string(), serde_json::Value::String(id));
+        }
+
+        let body = value.to_string();
+        let response = self._client.put(&doc_path, body).send().await?;
         let status = response.status();
         let data: DocumentCreatedResponse = response.json().await?;
 
