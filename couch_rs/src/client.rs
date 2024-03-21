@@ -323,23 +323,23 @@ impl Client {
             .headers(construct_json_headers(Some(uri.as_str())))
     }
 
-    pub(crate) fn get(&self, path: &str, args: Option<&HashMap<String, String>>) -> RequestBuilder {
+    pub fn get(&self, path: &str, args: Option<&HashMap<String, String>>) -> RequestBuilder {
         self.req(Method::GET, path, args)
     }
 
-    pub(crate) fn post(&self, path: &str, body: String) -> RequestBuilder {
+    pub fn post(&self, path: &str, body: String) -> RequestBuilder {
         self.req(Method::POST, path, None).body(body)
     }
 
-    pub(crate) fn put(&self, path: &str, body: String) -> RequestBuilder {
+    pub fn put(&self, path: &str, body: String) -> RequestBuilder {
         self.req(Method::PUT, path, None).body(body)
     }
 
-    pub(crate) fn head(&self, path: &str, args: Option<&HashMap<String, String>>) -> RequestBuilder {
+    pub fn head(&self, path: &str, args: Option<&HashMap<String, String>>) -> RequestBuilder {
         self.req(Method::HEAD, path, args)
     }
 
-    pub(crate) fn delete(&self, path: &str, args: Option<&HashMap<String, String>>) -> RequestBuilder {
+    pub fn delete(&self, path: &str, args: Option<&HashMap<String, String>>) -> RequestBuilder {
         self.req(Method::DELETE, path, args)
     }
 }
